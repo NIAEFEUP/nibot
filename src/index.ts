@@ -18,6 +18,6 @@ export default {
 
 	async scheduled(_event, env, _ctx): Promise<void> {
 		console.log("Running scheduled handler at", new Date().toISOString());
-		performFlutterCheck(env, false);
+		await performFlutterCheck(env, false);
 	},
 } satisfies ExportedHandler<Env>;
