@@ -1,23 +1,22 @@
-import { handleSlackCheck, performFlutterCheck } from "./lib";
+import { runScheduledFlutterCheck } from "./cron/flutter";
 
 export default {
-	async fetch(req, env) {
-		const url = new URL(req.url);
-
-		if (req.method === "POST" && url.pathname === "/slack/check") {
-			await handleSlackCheck(req, env);
-			return new Response("Slack check received", { status: 200 });
+	async fetch(req) {
+		if (req.method === "GET") {
+			const scheduledUrl = new URL(req.url);
+			scheduledUrl.pathname = "/__scheduled";
+			scheduledUrl.searchParams.append("cron", "0 */6 * * *");
+			return new Response(
+				"nibot is running.\n\n" +
+					`To test the scheduled handler locally, use "wrangler dev --test-scheduled" and then "curl ${scheduledUrl.href}".`,
+			);
 		}
 
-		url.pathname = "/__scheduled";
-		url.searchParams.append("cron", "0 */6 * * *");
-		return new Response(
-			`To test the scheduled handler, ensure you have used the "--test-scheduled" then try running "curl ${url.href}".`,
-		);
+		return new Response("Not found", { status: 404 });
 	},
 
 	async scheduled(_event, env, _ctx): Promise<void> {
 		console.log("Running scheduled handler at", new Date().toISOString());
-		await performFlutterCheck(env, false);
+		await runScheduledFlutterCheck(env);
 	},
 } satisfies ExportedHandler<Env>;
