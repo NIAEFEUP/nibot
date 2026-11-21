@@ -1,7 +1,23 @@
+import { handleChatEvent } from "./chat/events";
+import { verifyChatRequest } from "./chat/verify";
 import { runScheduledFlutterCheck } from "./cron/flutter";
 
 export default {
-	async fetch(req) {
+	async fetch(req, env) {
+		const url = new URL(req.url);
+
+		if (req.method === "POST" && url.pathname === "/chat/events") {
+			if (!(await verifyChatRequest(req))) {
+				return new Response("Unauthorized", { status: 401 });
+			}
+
+			const event = await req.json().catch(() => null);
+			const action = await handleChatEvent(event, env);
+			return new Response(JSON.stringify(action), {
+				headers: { "Content-Type": "application/json" },
+			});
+		}
+
 		if (req.method === "GET") {
 			const scheduledUrl = new URL(req.url);
 			scheduledUrl.pathname = "/__scheduled";
