@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "uni-bot",
+	"name": "nibot",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-11-25",
 	"observability": {
@@ -14,7 +14,7 @@
 	"preview_urls": false,
 	"routes": [
 		{
-			"pattern": "uni-bot.niaefeup.pt",
+			"pattern": "nibot.niaefeup.pt",
 			"custom_domain": true
 		}
 	],
